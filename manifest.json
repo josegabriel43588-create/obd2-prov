@@ -1,0 +1,29 @@
+{
+    "name": "Obd2-Prov Escáner Diagnóstico",
+    "short_name": "Obd2-Prov",
+    "description": "Escáner universal OBD2: lee sensores en tiempo real, detecta códigos de falla, borra Check Engine y accede a herramientas avanzadas de vehículos",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#050505",
+    "theme_color": "#3B82F6",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "https://i.imgur.com/8Z7Xz9L.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "https://i.imgur.com/5kDqR7x.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "lang": "es",
+    "dir": "ltr"
+}
