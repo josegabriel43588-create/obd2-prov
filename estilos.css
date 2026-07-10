@@ -1,0 +1,113 @@
+/* FUERZA FONDO OSCURO EN TODA LA APP */
+html, body, div, section, header, nav, main {
+    background-color: #050505 !important;
+    color: #FFFFFF !important;
+}
+
+/* BARRA DE ESTADO */
+.barra-estado {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 55px;
+    background: rgba(18, 22, 28, 0.9) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+}
+.punto { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.punto.rojo { background: #EF4444 !important; }
+.punto.verde { background: #22C55E !important; }
+.info-vehiculo { font-size: 14px; color: #B0B8C1 !important; }
+
+/* CONTENIDO */
+.contenedor-principal { margin-top: 70px; padding: 18px; }
+.pantalla { display: none; }
+.pantalla.activa { display: block; }
+.titulo-seccion { font-size: 22px; font-weight: 700; margin-bottom: 18px; color: #FFFFFF !important; }
+
+/* TARJETAS VIDRIO */
+.tarjeta-vidrio {
+    background: rgba(25, 30, 40, 0.8) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.tarjeta-vidrio h3 { font-size: 18px; margin-bottom: 15px; color: #FFFFFF !important; }
+.tarjeta-vidrio p { color: #B0B8C1 !important; font-size: 14px; }
+
+/* BOTONES REDONDEADOS */
+.btn-primario, .btn-secundario, .btn-terciario, .btn-peligro {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+.btn-primario { background: #3B82F6 !important; color: white !important; }
+.btn-peligro { background: #EF4444 !important; color: white !important; }
+.btn-secundario { background: rgba(255,255,255,0.1) !important; border: 1px solid rgba(255,255,255,0.2); }
+.btn.grande { padding: 18px; font-size: 17px; font-weight: 700; }
+
+/* CAMPOS DE TEXTO */
+.campo-texto, .campo-busqueda, .campo-select {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    color: #FFFFFF !important;
+    margin-bottom: 15px;
+}
+.separador { display: block; text-align: center; margin: 15px 0; color: #B0B8C1 !important; }
+
+/* CÓDIGOS DTC */
+.grupo-botones-principales { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+.resumen { display: flex; justify-content: space-around; text-align: center; }
+.numero { font-size: 24px; font-weight: 700; }
+.numero.rojo { color: #EF4444 !important; }
+.numero.amarillo { color: #F59E0B !important; }
+.numero.gris { color: #6B7280 !important; }
+.codigo-tarjeta { border-left: 6px solid; padding-left: 18px; margin-bottom: 16px; border-radius: 0 12px 12px 0; }
+.codigo-grave { border-color: #EF4444; background: rgba(239,68,68,0.05) !important; }
+.codigo-leve { border-color: #F59E0B; background: rgba(245,158,11,0.05) !important; }
+
+/* NAVEGACIÓN INFERIOR */
+.barra-navegacion {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 75px;
+    background: rgba(18, 22, 28, 0.9) !important;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 100;
+}
+.boton-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    color: #B0B8C1 !important;
+    font-size: 12px;
+    padding: 10px;
+    border-radius: 12px;
+}
+.boton-nav.activo { color: #3B82F6 !important; background: rgba(59,130,246,0.1) !important; }
+.icono-nav { font-size: 20px; }
