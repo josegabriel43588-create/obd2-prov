@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Obd2-Prov Escáner</title>
+    <!-- ✅ AQUÍ VA EL MANIFESTO Y CONFIGURACIÓN DE APP -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --fondo-principal: #050505 !important;
+            --vidrio-fondo: rgba(18, 22, 28, 0.85) !important;
+            --vidrio-borde: rgba(255, 255, 255, 0.12) !important;
+            --texto-principal: #FFFFFF !important;
+            --texto-secundario: #B0B8C1 !important;
+            --acento-azul: #3B82F6 !important;
+            --acento-rojo: #EF4444 !important;
+            --acento-verde: #22C55E !important;
+            --acento-amarillo: #F59E0B !important;
+            --borde-redondo: 16px !important;
+        }
+        * { background: var(--fondo-principal) !important; color: var(--texto-principal) !important; font-family: 'Segoe UI', Roboto, sans-serif !important; }
+        body { background: var(--fondo-principal) !important; margin: 0 !important; padding: 0 !important; min-height: 100vh !important; }
+        .bloqueado { opacity: 0.4 !important; pointer-events: none !important; filter: grayscale(0.5) !important; }
+        .aviso-bloqueo {
+            position: relative;
+            margin-top: 10px;
+            padding: 12px;
+            background: rgba(239,68,68,0.15) !important;
+            border: 1px solid var(--acento-rojo) !important;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--acento-rojo) !important;
+        }
+    </style>
+    <link rel="stylesheet" href="estilos.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- BARRA DE ESTADO -->
+    <header class="barra-estado">
+        <div class="estado-conexion">
+            <span class="punto rojo"></span>
+            <span id="textoEstado">Desconectado</span>
+        </div>
+        <div class="info-vehiculo" id="infoVehiculo">⚠️ Confirma el vehículo primero</div>
+    </header>
+
+    <main class="contenedor-principal">
+        <!-- PANTALLA CONEXIÓN (SIEMPRE VISIBLE) -->
+        <section class="pantalla activa" id="pantallaConexion">
+            <h2 class="titulo-seccion">🔌 CONEXIÓN UNIVERSAL</h2>
+            <div class="tarjeta-vidrio">
+                <h3>Detección de Adaptador</h3>
+                <div class="pasos-conexion">
+                    <div class="paso" id="paso1"><span class="icono-paso">1</span><span>Buscando adaptador Bluetooth/WiFi/BLE...</span></div>
+                    <div class="paso" id="paso2"><span class="icono-paso">2</span><span>Conectando al adaptador...</span></div>
+                    <div class="paso" id="paso3"><span class="icono-paso">3</span><span>Detectando protocolo OBD2...</span></div>
+                    <div class="paso" id="paso4"><span class="icono-paso">4</span><span>Conectado a la ECU del vehículo</span></div>
+                </div>
+                <button class="btn-primario" id="btnConectar">📶 Conectar Adaptador</button>
+                <button class="btn-secundario" id="btnReintentar">🔄 Reintentar</button>
+            </div>
+
+            <div class="tarjeta-vidrio margen-superior">
+                <h3>Identificación del Vehículo</h3>
+                <p style="color: var(--texto-secundario); font-size:14px; margin-bottom:15px;">⚠️ Debes confirmar estos datos para acceder a diagnósticos, sensores y herramientas</p>
+                <input type="text" class="campo-busqueda" id="buscarVehiculo" placeholder="Escribe marca, modelo o VIN...">
+                <button class="btn-terciario" id="btnLeerVIN">📥 Leer VIN automáticamente</button>
+                <span class="separador">o</span>
+                <input type="text" class="campo-texto" id="vinManual" placeholder="Ingresa VIN manualmente (17 caracteres)" maxlength="17">
+                <select class="campo-select" id="anioVehiculo">
+                    <option value="">Selecciona año</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2020">2020</option>
+                    <option value="2015">2015</option>
+                    <option value="2010">2010</option>
+                    <option value="2000">2000</option>
+                    <option value="1996">1996</option>
+                </select>
+                <div class="panel-decodificacion" id="panelVIN" style="display: none;">
+                    <h4>✅ Datos del Vehículo Detectado</h4>
+                    <div class="fila-datos"><span>VIN:</span> <span id="vinDeco"></span></div>
+                    <div class="fila-datos"><span>Marca:</span> <span id="marcaDeco"></span></div>
+                    <div class="fila-datos"><span>Modelo:</span> <span id="modeloDeco"></span></div>
+                    <div class="fila-datos"><span>Motor:</span> <span id="motorDeco"></span></div>
+                    <div class="fila-datos"><span>Año:</span> <span id="anioDeco"></span></div>
+                    <div style="margin-top:15px;">
+                        <button class="btn-primario" id="btnConfirmarVehiculo">✅ Aceptar y confirmar datos</button>
+                        <button class="btn-secundario" id="btnCancelarVehiculo">❌ Cancelar y corregir</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA SENSORES (BLOQUEADA POR DEFECTO) -->
+        <section class="pantalla bloqueada" id="pantallaSensores">
+            <h2 class="titulo-seccion">📡 SENSORES EN TIEMPO REAL</h2>
+            <div class="aviso-bloqueo">🔒 Acceso bloqueado: Confirma primero los datos del vehículo</div>
+            <div class="selector-unidades">
+                <button class="btn-unidades activo" id="btnMetricas">Métricas</button>
+                <button class="btn-unidades" id="btnImperiales">Imperiales</button>
+            </div>
+            <div class="cuadricula-sensores" id="listaSensores"></div>
+            <button class="btn-flotante" id="btnPausar">⏸️ Pausar</button>
+        </section>
+
+        <!-- PANTALLA DTC (BLOQUEADA POR DEFECTO) -->
+        <section class="pantalla bloqueada" id="pantallaCodigos">
+            <h2 class="titulo-seccion">⚠️ CÓDIGOS DE FALLA DTC</h2>
+            <div class="aviso-bloqueo">🔒 Acceso bloqueado: Confirma primero los datos del vehículo</div>
+            <div class="grupo-botones-principales">
+                <button class="btn-primario grande" id="btnEscanear">🔄 ESCANEAR CÓDIGOS</button>
+                <button class="btn-peligro grande" id="btnBorrar">🗑️ BORRAR CÓDIGOS Y CHECK ENGINE</button>
+            </div>
+            <div class="resumen-codigos" id="resumenCodigos" style="display: none;">
+                <div class="tarjeta-vidrio resumen">
+                    <div class="item-resumen"><span class="numero rojo" id="cantGraves">0</span> Graves</div>
+                    <div class="item-resumen"><span class="numero amarillo" id="cantLeves">0</span> Leves</div>
+                    <div class="item-resumen"><span class="numero gris" id="cantHistoricos">0</span> Históricos</div>
+                    <div class="item-resumen"><span class="numero total" id="cantTotal">0</span> Total</div>
+                </div>
+            </div>
+            <div class="lista-codigos" id="listaCodigos">
+                <div class="tarjeta-vidrio aviso">
+                    <p>Presiona <strong>ESCANEAR CÓDIGOS</strong> para ver los fallos del vehículo</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA HERRAMIENTAS (BLOQUEADA POR DEFECTO) -->
+        <section class="pantalla bloqueada" id="pantallaHerramientas">
+            <h2 class="titulo-seccion">🛠️ HERRAMIENTAS Y PRUEBAS</h2>
+            <div class="aviso-bloqueo">🔒 Acceso bloqueado: Confirma primero los datos del vehículo</div>
+            <div class="cuadricula-herramientas">
+                <div class="tarjeta-vidrio"><h4>Prueba Actuadores</h4></div>
+                <div class="tarjeta-vidrio"><h4>Reinicio Servicio</h4></div>
+                <div class="tarjeta-vidrio"><h4>Adaptación Acelerador</h4></div>
+                <div class="tarjeta-vidrio"><h4>Prueba Sistema EVAP</h4></div>
+                <div class="tarjeta-vidrio"><h4>Prueba ABS / Airbag</h4></div>
+                <div class="tarjeta-vidrio"><h4>Gráficos Dinámicos</h4></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- NAVEGACIÓN INFERIOR -->
+    <nav class="barra-navegacion">
+        <button class="boton-nav activo" data-pantalla="pantallaConexion"><span class="icono-nav">🔌</span><span>Conexión</span></button>
+        <button class="boton-nav bloqueado" data-pantalla="pantallaSensores"><span class="icono-nav">📊</span><span>Sensores</span></button>
+        <button class="boton-nav bloqueado" data-pantalla="pantallaCodigos"><span class="icono-nav">⚠️</span><span>Códigos</span></button>
+        <button class="boton-nav bloqueado" data-pantalla="pantallaHerramientas"><span class="icono-nav">🛠️</span><span>Herramientas</span></button>
+    </nav>
+
+    <!-- ✅ CÓDIGO PARA FUNCIONAMIENTO SIN INTERNET -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+        .catch(err => console.log('Error en SW:', err));
+    }
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
